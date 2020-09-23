@@ -1,10 +1,11 @@
 package parser
 
 import (
-	"helldb/query/ast"
-	"helldb/query/lexer"
 	"strconv"
 	"testing"
+
+	"helldb/query/ast"
+	"helldb/query/lexer"
 )
 
 func TestGetStatement(t *testing.T) {
@@ -53,7 +54,7 @@ func TestDelStatement(t *testing.T) {
 	}
 
 	if len(query.Statements) != 2 {
-		t.Fatalf("query.Statements does not contain 3 statements. got=%d",
+		t.Fatalf("query.Statements does not contain 2 statements. got=%d",
 			len(query.Statements))
 	}
 
@@ -140,6 +141,16 @@ func TestBooleanLiteral(t *testing.T) {
 	}
 }
 
+func TestParser_Errors(t *testing.T) {
+	input := `GET PUT 31;`
+	l := lexer.New(input)
+	p := New(l)
+	p.ParseQuery()
+	if len(p.Errors()) == 0 {
+		t.Error("no errors found. expected=2")
+	}
+}
+
 func TestCollectionLiteral(t *testing.T) {
 	input := `PUT ages [17, "Manan", ["nice"]];`
 
@@ -163,22 +174,25 @@ func TestCollectionLiteral(t *testing.T) {
 		t.Fatalf("value is not *ast.CollectionLiteral. got=%T", stmt.Value)
 	}
 
-	if len(value.Elements) != 3 {
+	elements := value.Elements
+
+	if len(elements) != 3 {
 		t.Fatalf("expected 3 elements in collections. got=%d",
-			len(value.Elements))
+			len(elements))
 	}
 
-	checkIntegerLiteral(t, value.Elements[0], 17)
-	checkStringLiteral(t, value.Elements[1], "Manan")
+	checkIntegerLiteral(t, elements[0], 17)
+	checkStringLiteral(t, elements[1], "Manan")
 
-	collectionValue, ok := value.Elements[2].(*ast.CollectionLiteral)
+	collectionValue, ok := elements[2].(*ast.CollectionLiteral)
+	collectionValueElements := collectionValue.Elements
 	if !ok {
-		t.Fatalf("value not *ast.CollectionLiteral. got=%T", value.Elements[2])
+		t.Fatalf("value not *ast.CollectionLiteral. got=%T", elements[2])
 	}
-	if len(collectionValue.Elements) != 1 {
-		t.Fatalf("expected 1 element in collection. got=%d", len(value.Elements))
+	if len(collectionValueElements) != 1 {
+		t.Fatalf("expected 1 element in collection. got=%d", len(elements))
 	}
-	checkStringLiteral(t, collectionValue.Elements[0], "nice")
+	checkStringLiteral(t, collectionValueElements[0], "nice")
 
 }
 

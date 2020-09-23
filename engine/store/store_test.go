@@ -59,8 +59,8 @@ func TestStore_Len(t *testing.T) {
 	if store.Len() == 0 {
 		initStore()
 	}
-	if store.Len() != 5 {
-		t.Errorf("store.Len() returned %d; expected=%d", store.Len(), 5)
+	if store.Len() != uint64(len(data)) {
+		t.Errorf("store.Len() returned %d; expected=%d", store.Len(), uint64(len(data)))
 	}
 }
 
@@ -70,6 +70,23 @@ func TestStore_JSON(t *testing.T) {
 	}
 	if store.JSON() != dataJson {
 		t.Errorf("store.JSON() returned %s. expected=%s", store.JSON(), dataJson)
+	}
+}
+
+func TestStore_Del(t *testing.T) {
+	if store.Len() == 0 {
+		initStore()
+	}
+	keys := []string{"age"}
+	if store.Del(keys)[0].Native() != true {
+		t.Error("key `age` does not exist in store")
+	}
+	if store.Get(keys)[0] != nil {
+		t.Error("key `age` was not deleted from store")
+	}
+
+	if store.Del([]string{"abcd"})[0].Native() != false {
+		t.Error("invalid key `abcd` deleted from store")
 	}
 }
 

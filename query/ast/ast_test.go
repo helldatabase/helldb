@@ -20,6 +20,39 @@ func TestString(t *testing.T) {
 			&PutStatement{
 				Token: Token{Type: PUT, Literal: "PUT"},
 				Key: Identifier{
+					Token: Token{Type: IDENT, Literal: "drinks"},
+					Value: "drinks",
+				},
+				Value: &BooleanLiteral{
+					Token: Token{Type: BOOL, Literal: "true"},
+					Value: true,
+				},
+			},
+			&DelStatement{
+				Token: Token{Type: DEL, Literal: "DEL"},
+				Keys: []Identifier{
+					{
+						Token: Token{Type: IDENT, Literal: "name"},
+						Value: "name",
+					},
+					{
+						Token: Token{Type: IDENT, Literal: "age"},
+						Value: "age",
+					},
+				},
+			},
+			&DelStatement{
+				Token: Token{Type: DEL, Literal: "DEL"},
+				Keys: []Identifier{
+					{
+						Token: Token{Type: IDENT, Literal: "drinks"},
+						Value: "drinks",
+					},
+				},
+			},
+			&PutStatement{
+				Token: Token{Type: PUT, Literal: "PUT"},
+				Key: Identifier{
 					Token: Token{Type: IDENT, Literal: "posts"},
 					Value: "posts",
 				},
@@ -61,6 +94,9 @@ func TestString(t *testing.T) {
 		},
 	}
 	if query.String() != `PUT age 69;
+PUT drinks true;
+DEL name & age;
+DEL drinks;
 PUT posts [420, ["hello-world"]];
 GET name & age;
 GET sex;`+"\n" {

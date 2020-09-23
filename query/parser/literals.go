@@ -44,15 +44,13 @@ func (p *Parser) parseCollectionLiteral() ast.ValueExpression {
 
 func (p *Parser) parseStringLiteral() ast.ValueExpression {
 	lit := &ast.StringLiteral{Token: p.curToken}
-	value := p.curToken.Literal
-	lit.Value = value
+	lit.Value = p.curToken.Literal
 	return lit
 }
 
 func (p *Parser) parseBooleanLiteral() ast.ValueExpression {
 	lit := &ast.BooleanLiteral{Token: p.curToken}
-	value := p.curToken.Literal == "true"
-	lit.Value = value
+	lit.Value = p.curToken.Literal == "true"
 	return lit
 }
 

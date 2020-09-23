@@ -15,10 +15,6 @@ func (p *Parser) nextToken() {
 	p.peekToken = p.l.NextToken()
 }
 
-func (p *Parser) curTokenIs(t token.Type) bool {
-	return p.curToken.Type == t
-}
-
 func (p *Parser) peekTokenIs(t token.Type) bool {
 	return p.peekToken.Type == t
 }

@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"helldb/query/ast"
 	"helldb/query/lexer"
 	"helldb/query/token"
@@ -59,7 +61,16 @@ func (p *Parser) parseStatement() ast.Statement {
 		return p.parsePutStatement()
 	case token.DEL:
 		return p.parseDelStatement()
+	case token.SEMICOLON:
+		return nil
 	default:
+		p.errors = append(
+			p.errors,
+			fmt.Sprintf(
+				"expected token to be COMMAND, got %s (%s)",
+				p.curToken.Type, p.curToken.Literal,
+			),
+		)
 		return nil
 	}
 }

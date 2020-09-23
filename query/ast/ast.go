@@ -3,8 +3,10 @@ package ast
 import (
 	"bytes"
 	"fmt"
-	"helldb/query/token"
+	"helldb/engine/types"
 	"strings"
+
+	"helldb/query/token"
 )
 
 type Node interface {
@@ -133,17 +135,19 @@ type IntegerLiteral struct {
 	Value int64
 }
 
-func (il *IntegerLiteral) expressionNode()      {}
-func (il *IntegerLiteral) TokenLiteral() string { return il.Token.Literal }
-func (il *IntegerLiteral) String() string       { return il.Token.Literal }
+func (il *IntegerLiteral) expressionNode()        {}
+func (il *IntegerLiteral) ToBaseType() *types.Int { return types.NewInt(il.Value) }
+func (il *IntegerLiteral) TokenLiteral() string   { return il.Token.Literal }
+func (il *IntegerLiteral) String() string         { return il.Token.Literal }
 
 type StringLiteral struct {
 	Token token.Token
 	Value string
 }
 
-func (sl *StringLiteral) expressionNode()      {}
-func (sl *StringLiteral) TokenLiteral() string { return sl.Token.Literal }
+func (sl *StringLiteral) expressionNode()           {}
+func (sl *StringLiteral) ToBaseType() *types.String { return types.NewString(sl.Value) }
+func (sl *StringLiteral) TokenLiteral() string      { return sl.Token.Literal }
 func (sl *StringLiteral) String() string {
 	return fmt.Sprintf(`"%s"`, sl.Token.Literal)
 }
@@ -153,8 +157,9 @@ type BooleanLiteral struct {
 	Value bool
 }
 
-func (bl *BooleanLiteral) expressionNode()      {}
-func (bl *BooleanLiteral) TokenLiteral() string { return bl.Token.Literal }
+func (bl *BooleanLiteral) expressionNode()            {}
+func (bl *BooleanLiteral) ToBaseType() *types.Boolean { return types.NewBoolean(bl.Value) }
+func (bl *BooleanLiteral) TokenLiteral() string       { return bl.Token.Literal }
 func (bl *BooleanLiteral) String() string {
 	if bl.Value {
 		return "true"
@@ -170,6 +175,22 @@ type CollectionLiteral struct {
 
 func (cl *CollectionLiteral) expressionNode()      {}
 func (cl *CollectionLiteral) TokenLiteral() string { return cl.Token.Literal }
+func (cl *CollectionLiteral) ToBaseType() *types.Collection {
+	elements := make([]types.BaseType, len(cl.Elements))
+	for i, element := range cl.Elements {
+		switch element.(type) {
+		case *IntegerLiteral:
+			elements[i] = element.(*IntegerLiteral).ToBaseType()
+		case *StringLiteral:
+			elements[i] = element.(*StringLiteral).ToBaseType()
+		case *BooleanLiteral:
+			elements[i] = element.(*BooleanLiteral).ToBaseType()
+		case *CollectionLiteral:
+			elements[i] = element.(*CollectionLiteral).ToBaseType()
+		}
+	}
+	return types.NewCollection(elements)
+}
 func (cl *CollectionLiteral) String() string {
 	var out bytes.Buffer
 

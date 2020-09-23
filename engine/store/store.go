@@ -52,15 +52,15 @@ func (s *Store) Del(keys []string) []types.Boolean {
 func (s *Store) Get(keys []string) []types.BaseType {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	var vals []types.BaseType
-	for _, key := range keys {
+	var values = make([]types.BaseType, len(keys), len(keys))
+	for i, key := range keys {
 		if val, ok := s.pairs[key]; ok {
-			vals = append(vals, val)
+			values[i] = val
 		} else {
-			vals = append(vals, nil)
+			values[i] = nil
 		}
 	}
-	return vals
+	return values
 }
 
 // JSON returns a utf-8 string as JSON with native conversions
