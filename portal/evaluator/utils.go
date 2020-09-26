@@ -3,21 +3,24 @@ package evaluator
 import (
 	"encoding/json"
 	"fmt"
+
 	"helldb/engine/types"
 	"helldb/query/ast"
 	"helldb/query/token"
 )
 
-func showResults(results []types.BaseType) {
+func showResults(results [][]types.BaseType) {
 	for _, result := range results {
-		var res interface{}
-		if result != nil {
-			res = result.Native()
-		} else {
-			res = nil
+		for _, retValue := range result {
+			var res interface{}
+			if retValue != nil {
+				res = retValue.Native()
+			} else {
+				res = nil
+			}
+			str, _ := json.MarshalIndent(res, "", "  ")
+			fmt.Println(string(str))
 		}
-		str, _ := json.MarshalIndent(res, "", "  ")
-		fmt.Println(string(str))
 	}
 }
 

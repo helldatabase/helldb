@@ -3,6 +3,7 @@ package evaluator
 import (
 	"bufio"
 	"fmt"
+	"helldb/engine/types"
 	"os"
 
 	s "helldb/engine/store"
@@ -19,7 +20,7 @@ func REPL(prompt string) {
 	fmt.Print(prompt)
 	for scanner.Scan() {
 		input := scanner.Text()
-		if input == "json" {
+		if input == "dumb" {
 			fmt.Println(store.JSON())
 			fmt.Print(prompt)
 			continue
@@ -39,32 +40,25 @@ func Eval(input string) Response {
 	p := parser.New(l)
 	query := p.ParseQuery()
 	if len(p.Errors()) == 0 {
-		for _, statement := range query.Statements {
+		results := make([][]types.BaseType, len(query.Statements))
+		for i, statement := range query.Statements {
 			if valid, isGet := isGetOrDelStatement(statement); valid {
 				var keys []string
 				if isGet {
 					keys = keysFromGetStatement(statement)
+					results[i] = store.Get(keys)
 				} else {
 					keys = keysFromDelStatement(statement)
+					results[i] = store.Del(keys)
 				}
-				return Response{Errors: nil, Results: store.Get(keys)}
 			} else {
 				putStatement := statement.(*ast.PutStatement)
-				key := putStatement.Key.String()
-				element := putStatement.Value
-				switch element.(type) {
-				case *ast.IntegerLiteral:
-					store.Put(key, element.(*ast.IntegerLiteral).ToBaseType())
-				case *ast.StringLiteral:
-					store.Put(key, element.(*ast.StringLiteral).ToBaseType())
-				case *ast.BooleanLiteral:
-					store.Put(key, element.(*ast.BooleanLiteral).ToBaseType())
-				case *ast.CollectionLiteral:
-					store.Put(key, element.(*ast.CollectionLiteral).ToBaseType())
-				}
-				return Response{Errors: nil, Results: nil}
+				key, value := putStatement.Key.String(), putStatement.Value
+				store.Put(key, ast.ExtractToBaseType(value))
+				results[i] = nil
 			}
 		}
+		return Response{Errors: p.Errors(), Results: results}
 	}
 	return Response{Errors: p.Errors(), Results: nil}
 }

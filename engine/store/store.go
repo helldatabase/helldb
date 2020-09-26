@@ -1,4 +1,4 @@
-// package store provides APIs for low level
+// Package store provides APIs for low level
 // interaction with the key-value data store.
 package store
 
@@ -31,16 +31,16 @@ func Init() *Store {
 // Del performs a thread safe delete over keys provided and
 // returns a slice of Booleans (BaseType implement) signifying
 // successful deletion if key was found.
-func (s *Store) Del(keys []string) []types.Boolean {
+func (s *Store) Del(keys []string) []types.BaseType {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	var statuses []types.Boolean
+	var statuses []types.BaseType
 	for _, key := range keys {
 		if _, ok := s.pairs[key]; ok {
 			delete(s.pairs, key)
-			statuses = append(statuses, *types.NewBoolean(true))
+			statuses = append(statuses, types.NewBoolean(true))
 		} else {
-			statuses = append(statuses, *types.NewBoolean(false))
+			statuses = append(statuses, types.NewBoolean(false))
 		}
 	}
 	return statuses

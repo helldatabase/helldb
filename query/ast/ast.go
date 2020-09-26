@@ -178,16 +178,7 @@ func (cl *CollectionLiteral) TokenLiteral() string { return cl.Token.Literal }
 func (cl *CollectionLiteral) ToBaseType() *types.Collection {
 	elements := make([]types.BaseType, len(cl.Elements))
 	for i, element := range cl.Elements {
-		switch element.(type) {
-		case *IntegerLiteral:
-			elements[i] = element.(*IntegerLiteral).ToBaseType()
-		case *StringLiteral:
-			elements[i] = element.(*StringLiteral).ToBaseType()
-		case *BooleanLiteral:
-			elements[i] = element.(*BooleanLiteral).ToBaseType()
-		case *CollectionLiteral:
-			elements[i] = element.(*CollectionLiteral).ToBaseType()
-		}
+		elements[i] = ExtractToBaseType(element)
 	}
 	return types.NewCollection(elements)
 }
