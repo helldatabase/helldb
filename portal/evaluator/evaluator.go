@@ -12,7 +12,7 @@ import (
 	"helldb/query/parser"
 )
 
-var store = s.Init()
+var Store = s.Init()
 
 func REPL(prompt string) {
 	fmt.Println("helldb client v0.0.1")
@@ -21,7 +21,7 @@ func REPL(prompt string) {
 	for scanner.Scan() {
 		input := scanner.Text()
 		if input == "dumb" {
-			fmt.Println(store.JSON())
+			fmt.Println(Store.JSON())
 			fmt.Print(prompt)
 			continue
 		}
@@ -46,15 +46,15 @@ func Eval(input string) Response {
 				var keys []string
 				if isGet {
 					keys = keysFromGetStatement(statement)
-					results[i] = store.Get(keys)
+					results[i] = Store.Get(keys)
 				} else {
 					keys = keysFromDelStatement(statement)
-					results[i] = store.Del(keys)
+					results[i] = Store.Del(keys)
 				}
 			} else {
 				putStatement := statement.(*ast.PutStatement)
 				key, value := putStatement.Key.String(), putStatement.Value
-				store.Put(key, ast.ExtractToBaseType(value))
+				Store.Put(key, ast.ExtractToBaseType(value))
 				results[i] = nil
 			}
 		}

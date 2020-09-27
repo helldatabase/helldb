@@ -20,3 +20,11 @@ func query(w http.ResponseWriter, r *http.Request) {
 		_, _ = fmt.Fprint(w, toJson(newError("query not provided")))
 	}
 }
+
+func status(w http.ResponseWriter, _ *http.Request) {
+	_, _ = fmt.Fprint(w, "ok")
+}
+
+func length(w http.ResponseWriter, _ *http.Request) {
+	_, _ = fmt.Fprintf(w, "%d", evaluator.Store.Len())
+}
