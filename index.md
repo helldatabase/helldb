@@ -1,37 +1,36 @@
-## Welcome to GitHub Pages
+# HellDB
 
-You can use the [editor on GitHub](https://github.com/helldatabase/helldb/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+HellDB is a distributed key-value store that lives in memory. It's written in Go to be performant and fault tolerant with wrappers existing in multiple languages.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## Installation
 
-### Markdown
+Download a binary from the releases page or build it yourself - 
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
-
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```sh
+$ go get github.com/heldatabase/helldb
+$ helldb
+2021/01/15 15:59:04 serving hell on http://localhost:8080
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+## Usage
 
-### Jekyll Themes
+HellDB is extremely simple to use. After running it on port 8080, you can send queries over http like so - 
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/helldatabase/helldb/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+```sh
+$ curl -s -X POST http://localhost:8080/query -d "query=GET hello;" | json_pp
+```
 
-### Support or Contact
+Or using some programming language - 
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+```python
+import requests
+url = 'http://localhost:8080/query'
+res = requests.post(url, data={'query': 'GET name;'}).json()
+```
+
+Or you can use a client libraries - 
+
+1. [HellPy](https://github.com/helldatabase/hellpy/)
+2. [HellJS](https://github.com/helldatabase/helljs/)
+3. [HellGo](https://github.com/helldatabase/hellgo/)
+4. [HellRb](https://github.com/helldatabase/hellrb/)
